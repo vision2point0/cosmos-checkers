@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package alice.checkers.module.v1;
+
+option go_package = "github.com/alice/checkers/api/module/v1";
+
+message ReqCheckersTorram {
+    string player1 = 1; // Player 1's identifier
+    string player2 = 2; // Player 2's identifier
+    int64 start_time = 3; // Start time of the game
+    int64 end_time = 4;   // End time of the game
+}
+
+message ResCheckersTorram {
+    bool success = 1;    // Indicates success or failure
+    string message = 2;  // Response message
+}
+
+service CheckersTorram {
+    rpc CheckersCreateGm (ReqCheckersTorram) returns (ResCheckersTorram);
+}
