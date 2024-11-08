@@ -15,7 +15,6 @@ import (
 
 	"github.com/alice/checkers"
 	"github.com/alice/checkers/keeper"
-	"github.com/alice/checkers/msg"
 )
 
 var (
@@ -40,16 +39,6 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 	}
 }
 
-func (am AppModule) RegisterServices(cfg module.Configurator) {
-	msg.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-}
-
-// RegisterInterfaces registers interfaces for the module.
-func (am AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
-	checkers.RegisterInterfaces(registry) // Register checkers interfaces
-	msg.RegisterInterfaces(registry)      // Register msg interfaces
-}
-
 func NewAppModuleBasic(m AppModule) module.AppModuleBasic {
 	return module.CoreAppModuleBasicAdaptor(m.Name(), m)
 }
@@ -68,21 +57,27 @@ func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwrunt
 	// }
 }
 
+// RegisterInterfaces registers interfaces and implementations of the checkers module.
+func (AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
+	checkers.RegisterInterfaces(registry)
+}
+
 // ConsensusVersion implements AppModule/ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return ConsensusVersion }
 
-// // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries.
-// func (am AppModule) RegisterServices(cfg module.Configurator) {
-// 	// Register servers
-// 	// checkers.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-// 	// checkers.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
+// RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries.
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	// Register servers
+	// checkers.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	// checkers.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
+	checkers.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 
-// 	// Register in place module state migration migrations
-// 	// m := keeper.NewMigrator(am.keeper)
-// 	// if err := cfg.RegisterMigration(checkers.ModuleName, 1, m.Migrate1to2); err != nil {
-// 	//     panic(fmt.Sprintf("failed to migrate x/%s from version 1 to 2: %v", checkers.ModuleName, err))
-// 	// }
-// }
+	// Register in place module state migration migrations
+	// m := keeper.NewMigrator(am.keeper)
+	// if err := cfg.RegisterMigration(checkers.ModuleName, 1, m.Migrate1to2); err != nil {
+	//     panic(fmt.Sprintf("failed to migrate x/%s from version 1 to 2: %v", checkers.ModuleName, err))
+	// }
+}
 
 // DefaultGenesis returns default genesis state as raw bytes for the module.
 func (AppModule) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {

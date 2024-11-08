@@ -2,20 +2,16 @@ syntax = "proto3";
 
 package alice.checkers.module.v1;
 
-option go_package = "github.com/alice/checkers/api/module/v1";
+import "cosmos/app/v1alpha1/module.proto";
 
-message ReqCheckersTorram {
-    string player1 = 1; // Player 1's identifier
-    string player2 = 2; // Player 2's identifier
-    int64 start_time = 3; // Start time of the game
-    int64 end_time = 4;   // End time of the game
-}
+// Module is the app config object of the module.
+// Learn more: https://docs.cosmos.network/main/building-modules/depinject
+message Module {
+  option (cosmos.app.v1alpha1.module) = {
+    go_import : "github.com/alice/checkers"
+  };
 
-message ResCheckersTorram {
-    bool success = 1;    // Indicates success or failure
-    string message = 2;  // Response message
-}
-
-service CheckersTorram {
-    rpc CheckersCreateGm (ReqCheckersTorram) returns (ResCheckersTorram);
+  // authority defines the custom module authority.
+  // if not set, defaults to the governance module.
+  string authority = 1;
 }
